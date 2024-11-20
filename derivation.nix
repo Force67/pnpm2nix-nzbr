@@ -88,7 +88,7 @@ in
           passthru =
             let
               processResult = processLockfile { inherit registry noDevDependencies; lockfile = pnpmLockYaml; };
-              verboseFlag = if verbose then "--loglevel info" else "--loglevel error";
+              verboseFlag = if verbose then "--reporter ndjson" else "";
               ignorePostInstallScriptsFlag = if ignorePostInstallScripts then "--ignore-scripts" else "";
             in
             {
