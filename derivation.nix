@@ -30,6 +30,7 @@ in
     , extraNodeModuleSources ? [ ]
     , copyPnpmStore ? true
     , copyNodeModules ? false
+    , verbose ? false
     , extraBuildInputs ? [ ]
     , nodejs ? nodePkg
     , pnpm ? nodejs.pkgs.pnpm
@@ -86,6 +87,7 @@ in
           passthru =
             let
               processResult = processLockfile { inherit registry noDevDependencies; lockfile = pnpmLockYaml; };
+              verboseFlag = if verbose then "--loglevel info" else "--loglevel error";
             in
             {
               inherit attrs;
@@ -103,7 +105,7 @@ in
                 mkdir -p $(dirname $store)
                 ln -s $out $(pnpm store path)
 
-                pnpm store add ${concatStringsSep " " (unique processResult.dependencyTarballs)}
+                pnpm store add ${verboseFlag} ${concatStringsSep " " (unique processResult.dependencyTarballs)}
               '';
 
               nodeModules = stdenv.mkDerivation {
@@ -148,7 +150,7 @@ in
                       installEnv
                   )}
 
-                  pnpm install ${optionalString noDevDependencies "--prod "}--frozen-lockfile --offline
+                  pnpm install ${verboseFlag} ${optionalString noDevDependencies "--prod "}--frozen-lockfile --offline
                 '';
 
                 installPhase = ''
