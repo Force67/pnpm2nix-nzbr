@@ -31,6 +31,7 @@ in
     , copyPnpmStore ? true
     , copyNodeModules ? false
     , verbose ? false
+    , ignorePostInstallScripts ? false
     , extraBuildInputs ? [ ]
     , nodejs ? nodePkg
     , pnpm ? nodejs.pkgs.pnpm
@@ -88,6 +89,7 @@ in
             let
               processResult = processLockfile { inherit registry noDevDependencies; lockfile = pnpmLockYaml; };
               verboseFlag = if verbose then "--loglevel info" else "--loglevel error";
+              ignorePostInstallScriptsFlag = if ignorePostInstallScripts then "--ignore-scripts" else "";
             in
             {
               inherit attrs;
@@ -150,7 +152,7 @@ in
                       installEnv
                   )}
 
-                  pnpm install ${verboseFlag} ${optionalString noDevDependencies "--prod "}--frozen-lockfile --offline
+                  pnpm install ${verboseFlag} ${optionalString noDevDependencies "--prod "}--frozen-lockfile --offline ${ignorePostInstallScriptsFlag}
                 '';
 
                 installPhase = ''
